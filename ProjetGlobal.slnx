@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FrontendMaui/FrontendMaui.csproj" />
+  <Project Path="ProjetApiNet/ProjetApiNet.csproj" />
+</Solution>

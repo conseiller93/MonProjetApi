@@ -1,0 +1,44 @@
+@ProjetApiNet_HostAddress = http://localhost:5270
+
+### GET /api/camions
+GET {{ProjetApiNet_HostAddress}}/api/camions
+###
+GET {{ProjetApiNet_HostAddress}}/api/camions/1
+###
+POST {{ProjetApiNet_HostAddress}}/api/camions
+Content-Type: application/json
+{
+    "immatriculation": "1234567890",
+    "modele": "Camion 1",
+    "chauffeurId": 1,
+    "groupeTransportId": 1,
+    "kilometrage": 1000
+}
+###
+PUT {{ProjetApiNet_HostAddress}}/api/camions/1
+Content-Type: application/json
+{
+    "immatriculation": "1234567890",
+    "modele": "Camion 1",
+    "chauffeurId": 1,
+    "groupeTransportId": 1,
+    "kilometrage": 1000
+}
+###
+DELETE {{ProjetApiNet_HostAddress}}/api/camions/1
+###
+
+### GET /api/utilisateurs
+GET {{ProjetApiNet_HostAddress}}/api/utilisateurs
+###
+GET {{ProjetApiNet_HostAddress}}/api/utilisateurs/1
+###
+POST {{ProjetApiNet_HostAddress}}/api/utilisateurs
+Content-Type: application/json
+
+{
+    "nom": "Doe",
+    "prenom": "John",
+    "email": "john.doe@example.com",
+    "motDePasse": "password123"
+}
