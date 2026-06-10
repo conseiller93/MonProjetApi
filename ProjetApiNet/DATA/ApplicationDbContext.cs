@@ -17,13 +17,16 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // ── Utilisateur ──────────────────────────────────────────────────────────
         modelBuilder.Entity<Utilisateur>(entity =>
         {
             entity.HasIndex(u => u.Identifiant).IsUnique();
             entity.Property(u => u.Identifiant).HasMaxLength(100);
             entity.Property(u => u.MotDePasseHash).HasMaxLength(256);
+            entity.Property(u => u.SalaireMensuelGNF).HasPrecision(18, 2);
         });
 
+        // ── ZoneMiniere ──────────────────────────────────────────────────────────
         modelBuilder.Entity<ZoneMiniere>(entity =>
         {
             entity.HasIndex(z => z.Nom).IsUnique();
@@ -33,6 +36,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(z => z.Tarification).HasPrecision(18, 2);
         });
 
+        // ── GroupeTransport ──────────────────────────────────────────────────────
         modelBuilder.Entity<GroupeTransport>(entity =>
         {
             entity.HasIndex(g => g.Nom).IsUnique();
@@ -49,6 +53,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        // ── Camion ───────────────────────────────────────────────────────────────
         modelBuilder.Entity<Camion>(entity =>
         {
             entity.HasIndex(c => c.Immatriculation).IsUnique();
@@ -67,14 +72,27 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        // ── Chargement ───────────────────────────────────────────────────────────
         modelBuilder.Entity<Chargement>(entity =>
         {
-            entity.Property(c => c.CarburantCalcule).HasPrecision(10, 2);
+            entity.Property(c => c.CarburantTotalLitres).HasPrecision(10, 2);
+            entity.Property(c => c.TarifGNF).HasPrecision(18, 2);
+            entity.Property(c => c.PrimeChauffeurGNF).HasPrecision(18, 2);
+            entity.Property(c => c.PrimeSuperviseurGroupeGNF).HasPrecision(18, 2);
+            entity.Property(c => c.PrimeSuperviseurZoneGNF).HasPrecision(18, 2);
+            entity.Property(c => c.PrimeSupervGenGNF).HasPrecision(18, 2);
 
+            // Relation Chargement → Camion
             entity.HasOne(c => c.Camion)
-                .WithMany(c => c.Chargements)
+                .WithMany(cam => cam.Chargements)
                 .HasForeignKey(c => c.CamionId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Relation Chargement → ZoneMiniere (pour calculs directs sans passer par Camion→Groupe→Zone)
+            entity.HasOne(c => c.ZoneMiniere)
+                .WithMany(z => z.Chargements)
+                .HasForeignKey(c => c.ZoneMiniereId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

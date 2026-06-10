@@ -1,9 +1,9 @@
 using Mapster;
-using TCA.API.DTOS;
-using TCA.API.Models;
-using TCA.API.Repositories;
+using ProjetApiNet.DTOs;        // CORRIGÉ : namespace unifié (plus de TCA.API.DTOS)
+using ProjetApiNet.Models;      // CORRIGÉ : namespace unifié (plus de TCA.API.Models)
+using ProjetApiNet.Repositories; // CORRIGÉ : namespace unifié (plus de TCA.API.Repositories)
 
-namespace TCA.API.Services
+namespace ProjetApiNet.Services  // CORRIGÉ : namespace unifié
 {
     public interface IGroupeTransportService
     {
@@ -19,12 +19,12 @@ namespace TCA.API.Services
         private readonly IGroupeTransportRepository _groupeTransportRepository;
         private readonly IZoneMiniereRepository _zoneMiniereRepository;
 
-        // Limites strictes définies dans la charte métier TCA
-        private const int NombreMaxGroupesTotal = 10; 
-        private const int NombreMaxGroupesParZone = 2;
+        // Limites strictes définies dans le PDF TCA
+        private const int NombreMaxGroupesTotal  = 10; // 10 groupes au total
+        private const int NombreMaxGroupesParZone =  2; // 2 groupes par zone (ex: Bankoh → Gr.01 et Gr.02)
 
         public GroupeTransportService(
-            IGroupeTransportRepository groupeTransportRepository, 
+            IGroupeTransportRepository groupeTransportRepository,
             IZoneMiniereRepository zoneMiniereRepository)
         {
             _groupeTransportRepository = groupeTransportRepository;
@@ -34,15 +34,17 @@ namespace TCA.API.Services
         public async Task<IEnumerable<GroupeTransportDto>> GetAllGroupesAsync()
         {
             var groupes = await _groupeTransportRepository.GetAllAsync();
+
+            // CORRIGÉ : Utilisateur n'a pas de propriétés Prenom/Nom, seulement Identifiant
             return groupes.Select(g => new GroupeTransportDto
             {
-                Id = g.Id,
-                Nom = g.Nom,
-                SuperviseurGroupeId = g.SuperviseurGroupeId,
-                SuperviseurGroupeNom = g.SuperviseurGroupe != null ? $"{g.SuperviseurGroupe.Prenom} {g.SuperviseurGroupe.Nom}" : null,
-                ZoneMiniereId = g.ZoneMiniereId,
-                ZoneMiniereNom = g.ZoneMiniere?.Nom,
-                NombreDeCamions = g.Camions?.Count ?? 0
+                Id                   = g.Id,
+                Nom                  = g.Nom,
+                SuperviseurGroupeId  = g.SuperviseurGroupeId,
+                SuperviseurGroupeNom = g.SuperviseurGroupe?.Identifiant,
+                ZoneMiniereId        = g.ZoneMiniereId,
+                ZoneMiniereNom       = g.ZoneMiniere?.Nom,
+                NombreDeCamions      = g.Camions?.Count ?? 0
             });
         }
 
@@ -51,39 +53,48 @@ namespace TCA.API.Services
             var g = await _groupeTransportRepository.GetByIdAsync(id);
             if (g == null) return null;
 
+            // CORRIGÉ : Identifiant au lieu de Prenom + Nom
             return new GroupeTransportDto
             {
-                Id = g.Id,
-                Nom = g.Nom,
-                SuperviseurGroupeId = g.SuperviseurGroupeId,
-                SuperviseurGroupeNom = g.SuperviseurGroupe != null ? $"{g.SuperviseurGroupe.Prenom} {g.SuperviseurGroupe.Nom}" : null,
-                ZoneMiniereId = g.ZoneMiniereId,
-                ZoneMiniereNom = g.ZoneMiniere?.Nom,
-                NombreDeCamions = g.Camions?.Count ?? 0
+                Id                   = g.Id,
+                Nom                  = g.Nom,
+                SuperviseurGroupeId  = g.SuperviseurGroupeId,
+                SuperviseurGroupeNom = g.SuperviseurGroupe?.Identifiant,
+                ZoneMiniereId        = g.ZoneMiniereId,
+                ZoneMiniereNom       = g.ZoneMiniere?.Nom,
+                NombreDeCamions      = g.Camions?.Count ?? 0
             };
         }
 
+        // Créer un groupe — CONTRAINTES :
+        //   • Max 10 groupes au total dans TCA
+        //   • Max 2 groupes par zone minière
+        //   • La zone cible doit exister
         public async Task<GroupeTransportDto> CreateGroupeAsync(GroupeTransportCreateDto dto)
         {
             var tousLesGroupes = await _groupeTransportRepository.GetAllAsync();
-            
-            // Règle 1 : TCA dispose de 10 groupes au total
+
+            // Limite globale TCA : 10 groupes maximum
             if (tousLesGroupes.Count() >= NombreMaxGroupesTotal)
             {
-                throw new InvalidOperationException($"Impossible de créer le groupe. La société TCA est limitée à un parc de {NombreMaxGroupesTotal} groupes de transport.");
+                throw new InvalidOperationException(
+                    $"Impossible de créer le groupe : TCA est limité à {NombreMaxGroupesTotal} groupes de transport.");
             }
 
+            // Vérification existence de la zone
             var zone = await _zoneMiniereRepository.GetByIdAsync(dto.ZoneMiniereId);
             if (zone == null)
             {
-                throw new KeyNotFoundException("La zone minière spécifiée n'existe pas.");
+                throw new KeyNotFoundException(
+                    $"La zone minière avec l'ID {dto.ZoneMiniereId} n'existe pas.");
             }
 
-            // Règle 2 : Répartition équitable (Ex: Bankoh -> Groupe 1 et 2, Djoumaya -> Groupe 3 et 4...) soit 2 groupes max par zone
+            // Limite par zone : 2 groupes max (Bankoh→01 et 02, Djoumaya→03 et 04, etc.)
             var groupesDansCetteZone = tousLesGroupes.Count(g => g.ZoneMiniereId == dto.ZoneMiniereId);
             if (groupesDansCetteZone >= NombreMaxGroupesParZone)
             {
-                throw new InvalidOperationException($"La zone minière '{zone.Nom}' a déjà atteint son quota maximal de {NombreMaxGroupesParZone} groupes de transport.");
+                throw new InvalidOperationException(
+                    $"La zone '{zone.Nom}' a déjà atteint son quota de {NombreMaxGroupesParZone} groupes de transport.");
             }
 
             var groupe = dto.Adapt<GroupeTransport>();
@@ -99,20 +110,21 @@ namespace TCA.API.Services
             var groupeExistant = await _groupeTransportRepository.GetByIdAsync(id);
             if (groupeExistant == null) return false;
 
+            // Si la zone change, vérifier la capacité de la nouvelle zone
             if (dto.ZoneMiniereId.HasValue && dto.ZoneMiniereId.Value != groupeExistant.ZoneMiniereId)
             {
                 var zoneCible = await _zoneMiniereRepository.GetByIdAsync(dto.ZoneMiniereId.Value);
                 if (zoneCible == null)
-                {
-                    throw new KeyNotFoundException("La zone minière cible spécifiée n'existe pas.");
-                }
+                    throw new KeyNotFoundException($"La zone minière cible (ID: {dto.ZoneMiniereId.Value}) n'existe pas.");
 
                 var tousLesGroupes = await _groupeTransportRepository.GetAllAsync();
-                var groupesDansZoneCible = tousLesGroupes.Count(g => g.ZoneMiniereId == dto.ZoneMiniereId.Value && g.Id != id);
+                var groupesDansZoneCible = tousLesGroupes
+                    .Count(g => g.ZoneMiniereId == dto.ZoneMiniereId.Value && g.Id != id);
 
                 if (groupesDansZoneCible >= NombreMaxGroupesParZone)
                 {
-                    throw new InvalidOperationException($"Mutation impossible. La zone cible '{zoneCible.Nom}' dispose déjà de {NombreMaxGroupesParZone} groupes.");
+                    throw new InvalidOperationException(
+                        $"Mutation impossible : la zone '{zoneCible.Nom}' a déjà {NombreMaxGroupesParZone} groupes.");
                 }
             }
 
@@ -126,9 +138,11 @@ namespace TCA.API.Services
             var groupe = await _groupeTransportRepository.GetByIdAsync(id);
             if (groupe == null) return false;
 
+            // Sécurité : refuser la suppression si des camions sont encore affectés au groupe
             if (groupe.Camions != null && groupe.Camions.Any())
             {
-                throw new InvalidOperationException("Impossible de supprimer un groupe de transport contenant encore des camions affectés.");
+                throw new InvalidOperationException(
+                    "Impossible de supprimer un groupe qui contient encore des camions affectés.");
             }
 
             _groupeTransportRepository.Delete(groupe);

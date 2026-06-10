@@ -23,8 +23,10 @@ public class ZoneMiniere
     [Column(TypeName = "decimal(18,2)")]
     public decimal Tarification { get; set; }
 
+    // Chargements max par mois par camion (issu du tableau des primes chauffeurs du PDF)
     public int ChargementsMaxParMois { get; set; }
 
-    // Relation fictive ou réelle selon votre architecture (ex: GroupeTransport)
-    // public ICollection<GroupeTransport> GroupesTransport { get; set; } = new List<GroupeTransport>();
+    // Relations — décommentées car utilisées dans ApplicationDbContext et GroupeTransportRepository
+    public ICollection<GroupeTransport> GroupesTransport { get; set; } = new List<GroupeTransport>();
+    public ICollection<Chargement> Chargements { get; set; } = new List<Chargement>();
 }

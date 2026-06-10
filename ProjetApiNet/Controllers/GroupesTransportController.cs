@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using TCA.API.DTOS;
-using TCA.API.Services;
+using ProjetApiNet.DTOs;       // CORRIGÉ : namespace unifié (plus de TCA.API.DTOS)
+using ProjetApiNet.Services;   // CORRIGÉ : namespace unifié (plus de TCA.API.Services)
 
-namespace TCA.API.Controllers
+namespace ProjetApiNet.Controllers  // CORRIGÉ : namespace unifié (plus de TCA.API.Controllers)
 {
     [ApiController]
     [Route("api/[controller]")]
-    // [Authorize] // Optionnel : À activer avec votre infrastructure JWT Authentication
     public class GroupesTransportController : ControllerBase
     {
         private readonly IGroupeTransportService _groupeTransportService;
@@ -27,10 +26,8 @@ namespace TCA.API.Controllers
         public async Task<ActionResult<GroupeTransportDto>> GetById(int id)
         {
             var groupe = await _groupeTransportService.GetGroupeByIdAsync(id);
-            if (groupe == null) 
-            {
+            if (groupe == null)
                 return NotFound(new { Message = $"Le groupe de transport avec l'ID {id} n'existe pas." });
-            }
 
             return Ok(groupe);
         }
@@ -63,10 +60,8 @@ namespace TCA.API.Controllers
             try
             {
                 var misAJour = await _groupeTransportService.UpdateGroupeAsync(id, dto);
-                if (!misAJour) 
-                {
+                if (!misAJour)
                     return NotFound(new { Message = $"Groupe de transport avec l'ID {id} introuvable." });
-                }
 
                 return NoContent();
             }
@@ -86,10 +81,8 @@ namespace TCA.API.Controllers
             try
             {
                 var supprime = await _groupeTransportService.DeleteGroupeAsync(id);
-                if (!supprime) 
-                {
+                if (!supprime)
                     return NotFound(new { Message = $"Groupe de transport avec l'ID {id} introuvable." });
-                }
 
                 return NoContent();
             }

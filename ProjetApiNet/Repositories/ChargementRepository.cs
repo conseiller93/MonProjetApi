@@ -29,8 +29,9 @@ public class ChargementRepository : IChargementRepository
     {
         return await _context.Set<Chargement>()
             .Include(c => c.Camion)
-                .ThenInclude(cam => cam.Groupe)
-                    .ThenInclude(g => g.Zone)
+                // CORRIGÉ : la propriété de navigation s'appelle GroupeTransport (pas Groupe)
+                .ThenInclude(cam => cam.GroupeTransport)
+            .Include(c => c.ZoneMiniere)  // CORRIGÉ : inclure directement ZoneMiniere depuis Chargement
             .ToListAsync();
     }
 
@@ -38,8 +39,8 @@ public class ChargementRepository : IChargementRepository
     {
         return await _context.Set<Chargement>()
             .Include(c => c.Camion)
-                .ThenInclude(cam => cam.Groupe)
-                    .ThenInclude(g => g.Zone)
+                .ThenInclude(cam => cam.GroupeTransport)
+            .Include(c => c.ZoneMiniere)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 

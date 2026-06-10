@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TCA.API.Data;
-using TCA.API.Models;
+using ProjetApiNet.Data;        // CORRIGÉ : namespace unifié (plus de TCA.API.Data)
+using ProjetApiNet.Models;      // CORRIGÉ : namespace unifié (plus de TCA.API.Models)
 
-namespace TCA.API.Repositories
+namespace ProjetApiNet.Repositories  // CORRIGÉ : namespace unifié (plus de TCA.API.Repositories)
 {
     public interface IGroupeTransportRepository
     {

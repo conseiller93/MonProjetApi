@@ -14,33 +14,60 @@ namespace ProjetApiNet.Services
         Task<bool> DeleteZoneAsync(int id);
     }
 
+    // ============================================================
+    // CONSTANTES MÉTIER — Source : Projet_TCA_Logistique_Miniere.pdf
+    // ============================================================
     public static class ZoneMiniereConstants
     {
+        // Limite stricte : TCA dispose de 5 zones minières
         public const int NombreMaxZones = 5;
-        public const int LitresParKilometre = 2; // Règle métier : 2 litres par km[cite: 1]
-        public static readonly TimeSpan HeureLimiteDepart = new TimeSpan(17, 30, 0); // Règle métier : Aucun départ après 17h30[cite: 1]
 
-        // Injection des données strictes provenant du PDF Projet_TCA_Logistique_Miniere.pdf[cite: 1]
-        public static readonly Dictionary<string, ZoneConfig> ConfigurationZones = new(StringComparer.OrdinalIgnoreCase)
+        // Règle carburant : 2 litres consommés par kilomètre parcouru
+        public const decimal LitresParKilometre = 2m;
+
+        // Règle horaire : aucun nouveau départ après 17h30 (les retours restent autorisés)
+        public static readonly TimeSpan HeureLimiteDepart = new TimeSpan(17, 30, 0);
+
+        // Prime fixe du superviseur général : 2 300 GNF par chargement effectué
+        public const decimal PrimeSupervGenParChargement = 2_300m;
+
+        // Données officielles des 5 zones (PDF pages 2, 3 et 4)
+        // Paramètres : DistanceDepotKm, ToursMaxParJour, TarifChargementGNF,
+        //              ChargementsMaxParMoisParCamion,
+        //              PrimeChauffeur, PrimeSuperviseurGroupe, PrimeSuperviseurZone
+        public static readonly Dictionary<string, ZoneConfig> Zones =
+            new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Bankoh"]   = new ZoneConfig(25, 4, 4500000, 104),   // 25km, 4 tours max, Tarification 4.500.000 GNF, Max 104 chrg/mois[cite: 1]
-            ["Djoumaya"] = new ZoneConfig(37, 3, 5700000, 78),    // 37km, 3 tours max, Tarification 5.700.000 GNF, Max 78 chrg/mois[cite: 1]
-            ["Kalima"]   = new ZoneConfig(22, 5, 4200000, 130),   // 22km, 5 tours max, Tarification 4.200.000 GNF, Max 130 chrg/mois[cite: 1]
-            ["Timbi"]    = new ZoneConfig(55, 2, 7500000, 52),    // 55km, 2 tours max, Tarification 7.500.000 GNF, Max 52 chrg/mois[cite: 1]
-            ["Soribaya"] = new ZoneConfig(35, 3, 5500000, 78)     // 35km, 3 tours max, Tarification 5.500.000 GNF, Max 78 chrg/mois[cite: 1]
+            ["Bankoh"]   = new ZoneConfig(25, 4, 4_500_000m, 104,  43_000m,  9_000m,  7_000m),
+            ["Djoumaya"] = new ZoneConfig(37, 3, 5_700_000m,  78,  58_000m, 12_000m,  9_500m),
+            ["Kalima"]   = new ZoneConfig(22, 5, 4_200_000m, 130,  35_000m,  7_500m,  5_500m),
+            ["Timbi"]    = new ZoneConfig(55, 2, 7_500_000m,  52,  88_000m, 18_000m, 14_000m),
+            ["Soribaya"] = new ZoneConfig(35, 3, 5_500_000m,  78,  58_000m, 12_000m,  9_500m),
         };
     }
 
+    // Objet de configuration immuable pour chaque zone
     public record ZoneConfig(
-        decimal DistanceDepotZone,
-        int ToursMaxParJour,
-        decimal Tarification,
-        int ChargementsMaxParMois
+        int    DistanceDepotKm,
+        int    ToursMaxParJour,
+        decimal TarifChargementGNF,
+        int    ChargementsMaxParMoisParCamion,
+        decimal PrimeChauffeur,
+        decimal PrimeSuperviseurGroupe,
+        decimal PrimeSuperviseurZone
     )
     {
-        public decimal DistanceAllerRetour => DistanceDepotZone * 2;
+        // Distance aller-retour calculée automatiquement
+        public int     DistanceAllerRetourKm    => DistanceDepotKm * 2;
+
+        // Carburant consommé pour un aller-retour complet (en litres)
+        public decimal CarburantAllerRetourLitres =>
+            DistanceAllerRetourKm * ZoneMiniereConstants.LitresParKilometre;
     }
 
+    // ============================================================
+    // SERVICE
+    // ============================================================
     public class ZoneMiniereService : IZoneMiniereService
     {
         private readonly IZoneMiniereRepository _zoneMiniereRepository;
@@ -62,27 +89,44 @@ namespace ProjetApiNet.Services
             return zone?.Adapt<ZoneMiniereDto>();
         }
 
+        // Créer une zone — CONTRAINTES :
+        //   • Max 5 zones dans le système TCA
+        //   • Le nom doit correspondre exactement à une des 5 zones officielles
+        //   • Toutes les données (distance, tarif, tours max) sont appliquées automatiquement
         public async Task<ZoneMiniereDto> CreateZoneAsync(ZoneMiniereCreateDto zoneMiniereCreateDto)
         {
             var zonesExistantes = await _zoneMiniereRepository.GetAllAsync();
+
             if (zonesExistantes.Count() >= ZoneMiniereConstants.NombreMaxZones)
             {
-                throw new InvalidOperationException($"Impossible de créer une nouvelle zone : le projet TCA est strictement limité à {ZoneMiniereConstants.NombreMaxZones} zones minières.");
+                throw new InvalidOperationException(
+                    $"Impossible de créer une nouvelle zone : TCA est limité à " +
+                    $"{ZoneMiniereConstants.NombreMaxZones} zones minières " +
+                    $"(Bankoh, Djoumaya, Kalima, Timbi, Soribaya).");
             }
 
-            if (!ZoneMiniereConstants.ConfigurationZones.TryGetValue(zoneMiniereCreateDto.Nom, out var config))
+            if (!ZoneMiniereConstants.Zones.TryGetValue(zoneMiniereCreateDto.Nom, out var config))
             {
-                throw new InvalidOperationException($"La zone '{zoneMiniereCreateDto.Nom}' n'est pas répertoriée dans le cahier des charges de TCA Guinée Mining SA.");
+                throw new InvalidOperationException(
+                    $"La zone '{zoneMiniereCreateDto.Nom}' n'est pas répertoriée dans le cahier des charges TCA. " +
+                    $"Zones autorisées : {string.Join(", ", ZoneMiniereConstants.Zones.Keys)}.");
             }
 
+            // Vérifier qu'une zone de même nom n'existe pas déjà
+            if (zonesExistantes.Any(z => z.Nom.Equals(zoneMiniereCreateDto.Nom, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException($"La zone '{zoneMiniereCreateDto.Nom}' existe déjà.");
+            }
+
+            // Application automatique des données officielles du PDF
             var zone = new ZoneMiniere
             {
-                Nom = zoneMiniereCreateDto.Nom,
-                DistanceDepotZone = config.DistanceDepotZone,
-                DistanceAllerRetour = config.DistanceAllerRetour,
-                ToursMaxParJour = config.ToursMaxParJour,
-                Tarification = config.Tarification,
-                ChargementsMaxParMois = config.ChargementsMaxParMois
+                Nom                   = zoneMiniereCreateDto.Nom,
+                DistanceDepotZone     = config.DistanceDepotKm,
+                DistanceAllerRetour   = config.DistanceAllerRetourKm,
+                ToursMaxParJour       = config.ToursMaxParJour,
+                Tarification          = config.TarifChargementGNF,
+                ChargementsMaxParMois = config.ChargementsMaxParMoisParCamion
             };
 
             await _zoneMiniereRepository.AddAsync(zone);
@@ -98,17 +142,20 @@ namespace ProjetApiNet.Services
 
             if (!string.IsNullOrWhiteSpace(zoneMiniereUpdateDto.Nom))
             {
-                if (!ZoneMiniereConstants.ConfigurationZones.TryGetValue(zoneMiniereUpdateDto.Nom, out var config))
+                if (!ZoneMiniereConstants.Zones.TryGetValue(zoneMiniereUpdateDto.Nom, out var config))
                 {
-                    throw new InvalidOperationException($"La zone '{zoneMiniereUpdateDto.Nom}' n'est pas valide.");
+                    throw new InvalidOperationException(
+                        $"La zone '{zoneMiniereUpdateDto.Nom}' n'est pas valide. " +
+                        $"Zones autorisées : {string.Join(", ", ZoneMiniereConstants.Zones.Keys)}.");
                 }
 
-                zoneExistante.Nom = zoneMiniereUpdateDto.Nom;
-                zoneExistante.DistanceDepotZone = config.DistanceDepotZone;
-                zoneExistante.DistanceAllerRetour = config.DistanceAllerRetour;
-                zoneExistante.ToursMaxParJour = config.ToursMaxParJour;
-                zoneExistante.Tarification = config.Tarification;
-                zoneExistante.ChargementsMaxParMois = config.ChargementsMaxParMois;
+                // Resynchronisation avec les données officielles
+                zoneExistante.Nom                   = zoneMiniereUpdateDto.Nom;
+                zoneExistante.DistanceDepotZone      = config.DistanceDepotKm;
+                zoneExistante.DistanceAllerRetour    = config.DistanceAllerRetourKm;
+                zoneExistante.ToursMaxParJour        = config.ToursMaxParJour;
+                zoneExistante.Tarification           = config.TarifChargementGNF;
+                zoneExistante.ChargementsMaxParMois  = config.ChargementsMaxParMoisParCamion;
             }
 
             _zoneMiniereRepository.Update(zoneExistante);

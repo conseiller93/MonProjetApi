@@ -33,12 +33,11 @@ GET {{ProjetApiNet_HostAddress}}/api/utilisateurs
 ###
 GET {{ProjetApiNet_HostAddress}}/api/utilisateurs/1
 ###
-POST {{ProjetApiNet_HostAddress}}/api/utilisateurs
+POST {{ProjetApiNet_HostAddress}}/api/utilisateurs/inscrire
 Content-Type: application/json
 
 {
-    "nom": "Doe",
-    "prenom": "John",
-    "email": "john.doe@example.com",
-    "motDePasse": "password123"
+    "identifiant": "mdiallo@gmail.com",
+    "motDePasse": "password123",
+    "role": 0
 }

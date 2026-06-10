@@ -6,4 +6,5 @@ public enum RoleUtilisateur
     SuperviseurGroupe,
     SuperviseurZone,
     SuperviseurGeneral
+    Administrateur
 }

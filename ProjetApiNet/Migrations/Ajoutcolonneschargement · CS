@@ -1,0 +1,122 @@
+using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace ProjetApiNet.Migrations
+{
+    /// <inheritdoc />
+    public partial class AjoutColonnesChargement : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            // Ajout de ZoneMiniereId sur la table Chargements
+            migrationBuilder.AddColumn<int>(
+                name: "ZoneMiniereId",
+                table: "Chargements",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
+
+            // Ajout du flag EstCloture (remplace/complète l'enum Statut pour les requêtes LINQ simples)
+            migrationBuilder.AddColumn<bool>(
+                name: "EstCloture",
+                table: "Chargements",
+                type: "INTEGER",  // SQLite stocke les bool comme INTEGER (0/1)
+                nullable: false,
+                defaultValue: false);
+
+            // Colonnes financières manquantes dans la première migration
+            migrationBuilder.AddColumn<decimal>(
+                name: "TarifGNF",
+                table: "Chargements",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "PrimeChauffeurGNF",
+                table: "Chargements",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "PrimeSuperviseurGroupeGNF",
+                table: "Chargements",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "PrimeSuperviseurZoneGNF",
+                table: "Chargements",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "PrimeSupervGenGNF",
+                table: "Chargements",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            // Colonne SalaireMensuelGNF manquante sur Utilisateurs
+            migrationBuilder.AddColumn<decimal>(
+                name: "SalaireMensuelGNF",
+                table: "Utilisateurs",
+                type: "TEXT",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            // Clé étrangère Chargements → ZoneMinieres
+            migrationBuilder.CreateIndex(
+                name: "IX_Chargements_ZoneMiniereId",
+                table: "Chargements",
+                column: "ZoneMiniereId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Chargements_ZoneMinieres_ZoneMiniereId",
+                table: "Chargements",
+                column: "ZoneMiniereId",
+                principalTable: "ZoneMinieres",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Chargements_ZoneMinieres_ZoneMiniereId",
+                table: "Chargements");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Chargements_ZoneMiniereId",
+                table: "Chargements");
+
+            migrationBuilder.DropColumn(name: "ZoneMiniereId",              table: "Chargements");
+            migrationBuilder.DropColumn(name: "EstCloture",                 table: "Chargements");
+            migrationBuilder.DropColumn(name: "TarifGNF",                   table: "Chargements");
+            migrationBuilder.DropColumn(name: "PrimeChauffeurGNF",          table: "Chargements");
+            migrationBuilder.DropColumn(name: "PrimeSuperviseurGroupeGNF",  table: "Chargements");
+            migrationBuilder.DropColumn(name: "PrimeSuperviseurZoneGNF",    table: "Chargements");
+            migrationBuilder.DropColumn(name: "PrimeSupervGenGNF",          table: "Chargements");
+            migrationBuilder.DropColumn(name: "SalaireMensuelGNF",          table: "Utilisateurs");
+        }
+    }
+}
