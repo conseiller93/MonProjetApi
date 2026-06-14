@@ -25,12 +25,12 @@ namespace ProjetApiNet.Repositories
 
         public async Task<IEnumerable<ZoneMiniere>> GetAllAsync()
         {
-            return await _context.Set<ZoneMiniere>().ToListAsync();
+            return await _context.Set<ZoneMiniere>().AsNoTracking().ToListAsync();
         }
 
         public async Task<ZoneMiniere?> GetByIdAsync(int id)
         {
-            return await _context.Set<ZoneMiniere>().FirstOrDefaultAsync(z => z.Id == id);
+            return await _context.Set<ZoneMiniere>().AsNoTracking().FirstOrDefaultAsync(z => z.Id == id);
         }
 
         public async Task AddAsync(ZoneMiniere zoneMiniere)

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetApiNet.DTOs;
 using ProjetApiNet.Services;
 
 namespace ProjetApiNet.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ChargementsController : ControllerBase
@@ -43,7 +45,7 @@ public class ChargementsController : ControllerBase
         }
         catch (System.InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return Problem(detail: ex.Message, statusCode: 400);
         }
     }
 
@@ -59,7 +61,7 @@ public class ChargementsController : ControllerBase
         }
         catch (System.InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return Problem(detail: ex.Message, statusCode: 400);
         }
     }
 
@@ -79,7 +81,7 @@ public class ChargementsController : ControllerBase
         }
         catch (System.InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return Problem(detail: ex.Message, statusCode: 400);
         }
     }
 

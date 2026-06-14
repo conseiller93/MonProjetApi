@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetApiNet.DTOs;
 using ProjetApiNet.Services;
 
 namespace ProjetApiNet.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ZonesMinieresController : ControllerBase
@@ -41,7 +43,7 @@ namespace ProjetApiNet.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return Problem(detail: ex.Message, statusCode: 400);
             }
         }
 
@@ -57,7 +59,7 @@ namespace ProjetApiNet.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return Problem(detail: ex.Message, statusCode: 400);
             }
         }
 

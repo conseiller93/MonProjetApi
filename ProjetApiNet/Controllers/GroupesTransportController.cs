@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetApiNet.DTOs;       // CORRIGÉ : namespace unifié (plus de TCA.API.DTOS)
 using ProjetApiNet.Services;   // CORRIGÉ : namespace unifié (plus de TCA.API.Services)
 
 namespace ProjetApiNet.Controllers  // CORRIGÉ : namespace unifié (plus de TCA.API.Controllers)
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class GroupesTransportController : ControllerBase
@@ -44,7 +46,7 @@ namespace ProjetApiNet.Controllers  // CORRIGÉ : namespace unifié (plus de TCA
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return Problem(detail: ex.Message, statusCode: 400);
             }
             catch (KeyNotFoundException ex)
             {
@@ -67,7 +69,7 @@ namespace ProjetApiNet.Controllers  // CORRIGÉ : namespace unifié (plus de TCA
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return Problem(detail: ex.Message, statusCode: 400);
             }
             catch (KeyNotFoundException ex)
             {
@@ -88,7 +90,7 @@ namespace ProjetApiNet.Controllers  // CORRIGÉ : namespace unifié (plus de TCA
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return Problem(detail: ex.Message, statusCode: 400);
             }
         }
     }

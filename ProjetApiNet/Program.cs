@@ -10,7 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Base de données
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
 
 builder.Services.AddControllers();
 
@@ -21,14 +25,18 @@ builder.Services.AddScoped<ICamionRepository, CamionRepository>();
 builder.Services.AddScoped<IChargementRepository, ChargementRepository>();
 builder.Services.AddScoped<IZoneMiniereRepository, ZoneMiniereRepository>();
 
-// 3. Injection de dépendances : SERVICES (Doublon CamionService supprimé ici)
+// 3. Injection de dépendances : SERVICES
 builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 builder.Services.AddScoped<IGroupeTransportService, GroupeTransportService>();
 builder.Services.AddScoped<ICamionService, CamionService>();
 builder.Services.AddScoped<IChargementService, ChargementService>();
 builder.Services.AddScoped<IZoneMiniereService, ZoneMiniereService>();
 
-// 4. configuration de l'AUTHENTIFICATION JWT (Ajout Majeur)
+// pour le test des api
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// 4. configuration de l'AUTHENTIFICATION JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "UneCleSuperSecreteDeMinimum32Caracteres!";
 var key = Encoding.UTF8.GetBytes(jwtKey);
 
@@ -57,16 +65,25 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// Appliquer les migrations automatiquement au démarrage
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 // Configuration du pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
 // IMPORTANT : L'authentification doit TOUJOURS être appelée avant l'autorisation
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

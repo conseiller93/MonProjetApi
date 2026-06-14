@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjetApiNet.Models  // CORRIGÉ : namespace unifié (plus de TCA.API.Models)
+namespace ProjetApiNet.Models
 {
     public class GroupeTransport
     {

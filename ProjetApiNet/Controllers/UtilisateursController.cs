@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetApiNet.DTOs;
 using ProjetApiNet.Services;
 
 namespace ProjetApiNet.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UtilisateursController : ControllerBase
@@ -34,6 +36,7 @@ namespace ProjetApiNet.Controllers
             return Ok(utilisateur);
         }
 
+        [AllowAnonymous]
         [HttpPost("inscrire")]
         public async Task<ActionResult<UtilisateurDto>> Inscrire(UtilisateurCreateDto dto)
         {
@@ -44,10 +47,11 @@ namespace ProjetApiNet.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(detail: ex.Message, statusCode: 400);
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<SessionResponseDto>> Login(ConnexionDto dto)
         {
@@ -71,7 +75,7 @@ namespace ProjetApiNet.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(detail: ex.Message, statusCode: 400);
             }
         }
 

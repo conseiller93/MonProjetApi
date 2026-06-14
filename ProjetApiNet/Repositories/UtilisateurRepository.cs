@@ -28,6 +28,7 @@ namespace ProjetApiNet.Repositories
         public async Task<IEnumerable<Utilisateur>> GetAllAsync()
         {
             return await _context.Set<Utilisateur>()
+                .AsNoTracking()
                 .Include(u => u.GroupesSupervises)
                 .Include(u => u.CamionsConduits)
                 .ToListAsync();
@@ -36,6 +37,7 @@ namespace ProjetApiNet.Repositories
         public async Task<Utilisateur?> GetByIdAsync(int id)
         {
             return await _context.Set<Utilisateur>()
+                .AsNoTracking()
                 .Include(u => u.GroupesSupervises)
                 .Include(u => u.CamionsConduits)
                 .FirstOrDefaultAsync(u => u.Id == id);

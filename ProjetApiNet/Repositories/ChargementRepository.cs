@@ -28,6 +28,7 @@ public class ChargementRepository : IChargementRepository
     public async Task<IEnumerable<Chargement>> GetAllAsync()
     {
         return await _context.Set<Chargement>()
+            .AsNoTracking()
             .Include(c => c.Camion)
                 // CORRIGÉ : la propriété de navigation s'appelle GroupeTransport (pas Groupe)
                 .ThenInclude(cam => cam.GroupeTransport)
@@ -38,6 +39,7 @@ public class ChargementRepository : IChargementRepository
     public async Task<Chargement?> GetByIdAsync(int id)
     {
         return await _context.Set<Chargement>()
+            .AsNoTracking()
             .Include(c => c.Camion)
                 .ThenInclude(cam => cam.GroupeTransport)
             .Include(c => c.ZoneMiniere)

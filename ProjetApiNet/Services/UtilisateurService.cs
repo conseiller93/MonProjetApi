@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BCrypt.Net;
 using Mapster;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ProjetApiNet.DTOs;
 using ProjetApiNet.Models;
@@ -44,11 +45,16 @@ namespace ProjetApiNet.Services
     {
         private readonly IUtilisateurRepository _utilisateurRepository;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<UtilisateurService> _logger;
 
-        public UtilisateurService(IUtilisateurRepository utilisateurRepository, IConfiguration configuration)
+        public UtilisateurService(
+            IUtilisateurRepository utilisateurRepository,
+            IConfiguration configuration,
+            ILogger<UtilisateurService> logger)
         {
             _utilisateurRepository = utilisateurRepository;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<UtilisateurDto>> GetAllUtilisateursAsync()
@@ -69,11 +75,20 @@ namespace ProjetApiNet.Services
 
             if (tousLesUtilisateurs.Any(u => u.Identifiant.Equals(utilisateurCreateDto.Identifiant, StringComparison.OrdinalIgnoreCase)))
             {
+                _logger.LogWarning("Tentative d'inscription échouée : l'identifiant {Identifiant} est déjà utilisé.", utilisateurCreateDto.Identifiant);
                 throw new InvalidOperationException($"L'identifiant '{utilisateurCreateDto.Identifiant}' est déjà utilisé.");
             }
 
             // Vérification des quotas du PDF avant acceptation
-            VerifierQuotaRole(tousLesUtilisateurs, utilisateurCreateDto.Role);
+            try
+            {
+                VerifierQuotaRole(tousLesUtilisateurs, utilisateurCreateDto.Role);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning("Tentative d'inscription de {Identifiant} refusée : {Message}", utilisateurCreateDto.Identifiant, ex.Message);
+                throw;
+            }
 
             var utilisateur = utilisateurCreateDto.Adapt<Utilisateur>();
             utilisateur.MotDePasseHash = BCrypt.Net.BCrypt.HashPassword(utilisateurCreateDto.MotDePasse);
@@ -81,6 +96,8 @@ namespace ProjetApiNet.Services
 
             await _utilisateurRepository.AddAsync(utilisateur);
             await _utilisateurRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Utilisateur {Identifiant} inscrit avec succès avec le rôle {Role}.", utilisateur.Identifiant, utilisateur.Role);
 
             return utilisateur.Adapt<UtilisateurDto>();
         }
@@ -135,10 +152,13 @@ namespace ProjetApiNet.Services
 
             if (utilisateur == null || !BCrypt.Net.BCrypt.Verify(connexionDto.MotDePasse, utilisateur.MotDePasseHash))
             {
+                _logger.LogWarning("Échec de connexion pour l'identifiant {Identifiant}.", connexionDto.Identifiant);
                 return null;
             }
 
             var token = GenererTokenJWT(utilisateur);
+
+            _logger.LogInformation("Connexion réussie pour l'utilisateur {Identifiant}.", utilisateur.Identifiant);
 
             return new SessionResponseDto
             {

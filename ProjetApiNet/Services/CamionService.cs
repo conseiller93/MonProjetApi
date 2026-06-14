@@ -23,7 +23,7 @@ namespace ProjetApiNet.Services
         private readonly ICamionRepository _camionRepository;
         private readonly IGroupeTransportRepository _groupeTransportRepository;
 
-        // Limites strictes définies dans le PDF
+        // Limites strictes définies dans le cahier de charge
         private const int NombreMaxCamionsFlotte = 100;
         private const int NombreMaxCamionsParGroupe = 10;
 

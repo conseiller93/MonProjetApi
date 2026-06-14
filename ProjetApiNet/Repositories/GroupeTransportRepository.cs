@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjetApiNet.Data;        // CORRIGÉ : namespace unifié (plus de TCA.API.Data)
 using ProjetApiNet.Models;      // CORRIGÉ : namespace unifié (plus de TCA.API.Models)
-
+ 
 namespace ProjetApiNet.Repositories  // CORRIGÉ : namespace unifié (plus de TCA.API.Repositories)
 {
     public interface IGroupeTransportRepository
@@ -26,6 +26,7 @@ namespace ProjetApiNet.Repositories  // CORRIGÉ : namespace unifié (plus de TC
         public async Task<IEnumerable<GroupeTransport>> GetAllAsync()
         {
             return await _context.Set<GroupeTransport>()
+                .AsNoTracking()
                 .Include(g => g.SuperviseurGroupe)
                 .Include(g => g.ZoneMiniere)
                 .Include(g => g.Camions)
@@ -35,6 +36,7 @@ namespace ProjetApiNet.Repositories  // CORRIGÉ : namespace unifié (plus de TC
         public async Task<GroupeTransport?> GetByIdAsync(int id)
         {
             return await _context.Set<GroupeTransport>()
+                .AsNoTracking()
                 .Include(g => g.SuperviseurGroupe)
                 .Include(g => g.ZoneMiniere)
                 .Include(g => g.Camions)
