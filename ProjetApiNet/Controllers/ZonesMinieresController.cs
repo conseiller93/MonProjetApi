@@ -66,10 +66,17 @@ namespace ProjetApiNet.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var supprime = await _zoneMiniereService.DeleteZoneAsync(id);
-            if (!supprime) return NotFound(new { Message = $"Zone minière {id} introuvable." });
+            try
+            {
+                var supprime = await _zoneMiniereService.DeleteZoneAsync(id);
+                if (!supprime) return NotFound(new { Message = $"Zone minière {id} introuvable." });
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Problem(detail: ex.Message, statusCode: 400);
+            }
         }
     }
 }

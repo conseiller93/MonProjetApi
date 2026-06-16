@@ -71,10 +71,17 @@ namespace ProjetApiNet.Services
     public class ZoneMiniereService : IZoneMiniereService
     {
         private readonly IZoneMiniereRepository _zoneMiniereRepository;
+        private readonly IChargementRepository _chargementRepository;
+        private readonly IGroupeTransportRepository _groupeTransportRepository;
 
-        public ZoneMiniereService(IZoneMiniereRepository zoneMiniereRepository)
+        public ZoneMiniereService(
+            IZoneMiniereRepository zoneMiniereRepository,
+            IChargementRepository chargementRepository,
+            IGroupeTransportRepository groupeTransportRepository)
         {
             _zoneMiniereRepository = zoneMiniereRepository;
+            _chargementRepository = chargementRepository;
+            _groupeTransportRepository = groupeTransportRepository;
         }
 
         public async Task<IEnumerable<ZoneMiniereDto>> GetAllZonesAsync()
@@ -166,6 +173,22 @@ namespace ProjetApiNet.Services
         {
             var zone = await _zoneMiniereRepository.GetByIdAsync(id);
             if (zone == null) return false;
+
+            // 1. Vérifier s'il y a des chargements liés (actifs ou passés)
+            var tousLesChargements = await _chargementRepository.GetAllAsync();
+            bool aDesChargements = tousLesChargements.Any(c => c.ZoneMiniereId == id);
+            if (aDesChargements)
+            {
+                throw new InvalidOperationException("Impossible de supprimer cette zone car elle est liée à des chargements actifs ou passés.");
+            }
+
+            // 2. Vérifier s'il y a des Groupes de Transport liés
+            var tousLesGroupes = await _groupeTransportRepository.GetAllAsync();
+            bool aDesGroupes = tousLesGroupes.Any(g => g.ZoneMiniereId == id);
+            if (aDesGroupes)
+            {
+                throw new InvalidOperationException("Impossible de supprimer cette zone car un groupe de transport y est affecté.");
+            }
 
             _zoneMiniereRepository.Delete(zone);
             return await _zoneMiniereRepository.SaveChangesAsync();

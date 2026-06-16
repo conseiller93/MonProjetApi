@@ -24,14 +24,14 @@ services:
       context: ./ProjetApiNet
       dockerfile: Dockerfile
     ports:
-      - "5000:8080"
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=projetapinet;User=projetuser;Password=projetpass;
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=projetapinet;User=projetuser;Password=projetpass;    
       - ConnectionStrings__MySqlConnection=Server=db;Port=3306;Database=projetapinet;User=projetuser;Password=projetpass;
 
 volumes:

@@ -134,7 +134,22 @@ namespace ProjetApiNet.Services
                 }
             }
 
-            camionUpdateDto.Adapt(camionExistant);
+            // On ne met à jour QUE si le champ est fourni dans le DTO
+            if (camionUpdateDto.Immatriculation != null) 
+                camionExistant.Immatriculation = camionUpdateDto.Immatriculation;
+
+            if (camionUpdateDto.Modele != null) 
+                camionExistant.Modele = camionUpdateDto.Modele;
+
+            if (camionUpdateDto.ChauffeurId.HasValue) 
+                camionExistant.ChauffeurId = camionUpdateDto.ChauffeurId.Value;
+
+            if (camionUpdateDto.GroupeTransportId.HasValue) 
+                camionExistant.GroupeTransportId = camionUpdateDto.GroupeTransportId.Value;
+
+            if (camionUpdateDto.Kilometrage.HasValue) 
+                camionExistant.Kilometrage = camionUpdateDto.Kilometrage.Value;
+
             _camionRepository.Update(camionExistant);
             return await _camionRepository.SaveChangesAsync();
         }

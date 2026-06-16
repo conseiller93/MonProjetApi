@@ -109,24 +109,38 @@ namespace ProjetApiNet.Services
 
             var tousLesUtilisateurs = await _utilisateurRepository.GetAllAsync();
 
-            // Si le rôle change, on valide les quotas du nouveau rôle et on met à jour le salaire
+            // 1. Si le rôle change, on valide les quotas du nouveau rôle et on met à jour le salaire
             if (utilisateurUpdateDto.Role.HasValue && utilisateurUpdateDto.Role.Value != utilisateurExistant.Role)
             {
                 VerifierQuotaRole(tousLesUtilisateurs, utilisateurUpdateDto.Role.Value, idExclu: id);
                 utilisateurExistant.SalaireMensuelGNF = GetSalaireParRole(utilisateurUpdateDto.Role.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(utilisateurUpdateDto.Identifiant) && 
-                !utilisateurUpdateDto.Identifiant.Equals(utilisateurExistant.Identifiant, StringComparison.OrdinalIgnoreCase))
-            {
-                if (tousLesUtilisateurs.Any(u => u.Identifiant.Equals(utilisateurUpdateDto.Identifiant, StringComparison.OrdinalIgnoreCase) && u.Id != id))
-                {
-                    throw new InvalidOperationException($"L'identifiant '{utilisateurUpdateDto.Identifiant}' est déjà utilisé.");
-                }
-            }
+            // 2. Sauvegarder l'identifiant d'origine pour éviter que Mapster ne l'écrase avec du null
+            var identifiantOrigine = utilisateurExistant.Identifiant;
 
+            // 3. Appliquer le mapping automatique de Mapster sur le reste des champs
             utilisateurUpdateDto.Adapt(utilisateurExistant);
 
+            // 4. Forcer la restauration de l'identifiant initial (ou appliquer le nouveau s'il est valide)
+            if (!string.IsNullOrWhiteSpace(utilisateurUpdateDto.Identifiant))
+            {
+                if (!utilisateurUpdateDto.Identifiant.Equals(identifiantOrigine, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (tousLesUtilisateurs.Any(u => u.Identifiant.Equals(utilisateurUpdateDto.Identifiant, StringComparison.OrdinalIgnoreCase) && u.Id != id))
+                    {
+                        throw new InvalidOperationException($"L'identifiant '{utilisateurUpdateDto.Identifiant}' est déjà utilisé.");
+                    }
+                    utilisateurExistant.Identifiant = utilisateurUpdateDto.Identifiant;
+                }
+            }
+            else
+            {
+                // Si aucun identifiant n'est fourni dans le DTO, on garde précieusement celui de la base
+                utilisateurExistant.Identifiant = identifiantOrigine;
+            }
+
+            // 5. Gestion du mot de passe
             if (!string.IsNullOrWhiteSpace(utilisateurUpdateDto.MotDePasse))
             {
                 utilisateurExistant.MotDePasseHash = BCrypt.Net.BCrypt.HashPassword(utilisateurUpdateDto.MotDePasse);
