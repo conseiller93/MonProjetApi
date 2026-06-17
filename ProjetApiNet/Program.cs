@@ -31,6 +31,7 @@ builder.Services.AddScoped<IGroupeTransportService, GroupeTransportService>();
 builder.Services.AddScoped<ICamionService, CamionService>();
 builder.Services.AddScoped<IChargementService, ChargementService>();
 builder.Services.AddScoped<IZoneMiniereService, ZoneMiniereService>();
+builder.Services.AddScoped<IStatistiqueService, StatistiqueService>();
 
 // pour le test des api
 builder.Services.AddEndpointsApiExplorer();
@@ -80,7 +81,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // IMPORTANT : L'authentification doit TOUJOURS être appelée avant l'autorisation
 app.UseAuthentication();
