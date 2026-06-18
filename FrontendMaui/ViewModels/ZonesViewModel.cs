@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
-using FrontendMaui.Models;
+using FrontendMaui.DTOs;
 using FrontendMaui.Services;
 
 namespace FrontendMaui.ViewModels;
@@ -9,7 +9,7 @@ public partial class ZonesViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
 
-    public ObservableCollection<ZoneMiniere> Zones { get; } = new();
+    public ObservableCollection<ZoneDto> Zones { get; } = new();
 
     public ZonesViewModel(ApiService apiService)
     {

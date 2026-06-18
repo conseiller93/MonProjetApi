@@ -22,4 +22,9 @@
         ContentTemplate="{DataTemplate views:RegisterPage}"
         Route="RegisterPage" />
 
+    <ShellContent
+        Title="Dashboard"
+        ContentTemplate="{DataTemplate views:DashboardPage}"
+        Route="DashboardPage" />
+
 </Shell>

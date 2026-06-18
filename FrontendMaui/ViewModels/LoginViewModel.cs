@@ -83,6 +83,6 @@ public class LoginViewModel : BaseViewModel
         }
 
         // Navigation vers le Dashboard (sera défini dans AppShell)
-        await Shell.Current.GoToAsync("//DashboardPage");
+        await Shell.Current.GoToAsync("///DashboardPage");
     }
 }

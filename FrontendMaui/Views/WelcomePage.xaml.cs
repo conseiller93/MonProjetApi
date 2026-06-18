@@ -12,11 +12,11 @@ public partial class WelcomePage : ContentPage
 
     private async void OnSeConnecterClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("LoginPage");
+        await Shell.Current.GoToAsync("///LoginPage");
     }
 
     private async void OnSInscrireClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("RegisterPage");
+        await Shell.Current.GoToAsync("///RegisterPage");
     }
 }

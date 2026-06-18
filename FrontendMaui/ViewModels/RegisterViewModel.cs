@@ -66,7 +66,7 @@ public class RegisterViewModel : BaseViewModel
     {
         _apiService = apiService;
         RegisterCommand = new Command(async () => await RegisterAsync(), () => CanRegister && IsNotBusy);
-        GoToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("//LoginPage"));
+        GoToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("///LoginPage"));
     }
 
     private async Task RegisterAsync()
@@ -103,7 +103,7 @@ public class RegisterViewModel : BaseViewModel
             if (succes)
             {
                 await Shell.Current.DisplayAlert("Succès", "Compte créé avec succès. Vous pouvez maintenant vous connecter.", "OK");
-                await Shell.Current.GoToAsync("//LoginPage");
+                await Shell.Current.GoToAsync("///LoginPage");
             }
             else
             {

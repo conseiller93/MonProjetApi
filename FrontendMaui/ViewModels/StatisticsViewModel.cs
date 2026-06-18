@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FrontendMaui.Models;
+using System.Linq;
 using FrontendMaui.Services;
 
 namespace FrontendMaui.ViewModels;
@@ -11,13 +12,13 @@ public partial class StatisticsViewModel : BaseViewModel
     private readonly ApiService _apiService;
 
     [ObservableProperty]
-    int totalChargements;
+    private int _totalChargements;
 
     [ObservableProperty]
-    decimal totalCarburant;
+    private decimal _totalCarburant;
 
     [ObservableProperty]
-    decimal totalPrimes;
+    private decimal _totalPrimes;
 
     public StatisticsViewModel(ApiService apiService)
     {
@@ -35,9 +36,9 @@ public partial class StatisticsViewModel : BaseViewModel
             IsBusy = true;
             var chargements = await _apiService.GetChargementsAsync();
 
-            TotalChargements = chargements.Count;
-            TotalCarburant = chargements.Sum(c => c.CarburantTotalLitres);
-            TotalPrimes = chargements.Sum(c => c.PrimeChauffeurGNF + c.PrimeSuperviseurGroupeGNF + c.PrimeSuperviseurZoneGNF + c.PrimeSupervGenGNF);
+            _totalChargements = chargements.Count;
+            _totalCarburant = chargements.Sum(c => c.CarburantTotalLitres);
+            _totalPrimes = chargements.Sum(c => c.PrimeChauffeurGNF + c.PrimeSuperviseurGroupeGNF + c.PrimeSuperviseurZoneGNF + c.PrimeSupervGenGNF);
         }
         catch (Exception ex)
         {

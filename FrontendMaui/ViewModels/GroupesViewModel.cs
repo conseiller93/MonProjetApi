@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
-using FrontendMaui.Models;
+using FrontendMaui.DTOs;
 using FrontendMaui.Services;
 
 namespace FrontendMaui.ViewModels;
@@ -9,7 +9,7 @@ public partial class GroupesViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
 
-    public ObservableCollection<GroupeTransport> Groupes { get; } = new();
+    public ObservableCollection<GroupeDto> Groupes { get; } = new();
 
     public GroupesViewModel(ApiService apiService)
     {

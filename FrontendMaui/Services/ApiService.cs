@@ -97,4 +97,57 @@ public class ApiService
     }
 
     public HttpClient Client => _httpClient;
+
+    // Placeholder convenience methods used by ViewModels
+    public async Task<List<FrontendMaui.DTOs.ChauffeurDto>> GetChauffeursAsync()
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<List<FrontendMaui.DTOs.ChauffeurDto>>("Utilisateurs/chauffeurs");
+            return res ?? new List<FrontendMaui.DTOs.ChauffeurDto>();
+        }
+        catch
+        {
+            return new List<FrontendMaui.DTOs.ChauffeurDto>();
+        }
+    }
+
+    public async Task<List<FrontendMaui.DTOs.GroupeDto>> GetGroupesAsync()
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<List<FrontendMaui.DTOs.GroupeDto>>("Groupes");
+            return res ?? new List<FrontendMaui.DTOs.GroupeDto>();
+        }
+        catch
+        {
+            return new List<FrontendMaui.DTOs.GroupeDto>();
+        }
+    }
+
+    public async Task<List<FrontendMaui.DTOs.ZoneDto>> GetZonesAsync()
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<List<FrontendMaui.DTOs.ZoneDto>>("Zones");
+            return res ?? new List<FrontendMaui.DTOs.ZoneDto>();
+        }
+        catch
+        {
+            return new List<FrontendMaui.DTOs.ZoneDto>();
+        }
+    }
+
+    public async Task<List<FrontendMaui.DTOs.ChargementDto>> GetChargementsAsync()
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<List<FrontendMaui.DTOs.ChargementDto>>("Chargements");
+            return res ?? new List<FrontendMaui.DTOs.ChargementDto>();
+        }
+        catch
+        {
+            return new List<FrontendMaui.DTOs.ChargementDto>();
+        }
+    }
 }

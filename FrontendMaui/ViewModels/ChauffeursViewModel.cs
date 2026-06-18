@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
-using FrontendMaui.Models;
+using FrontendMaui.DTOs;
 using FrontendMaui.Services;
 
 namespace FrontendMaui.ViewModels;
@@ -9,7 +9,7 @@ public partial class ChauffeursViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
 
-    public ObservableCollection<Utilisateur> Chauffeurs { get; } = new();
+    public ObservableCollection<ChauffeurDto> Chauffeurs { get; } = new();
 
     public ChauffeursViewModel(ApiService apiService)
     {
