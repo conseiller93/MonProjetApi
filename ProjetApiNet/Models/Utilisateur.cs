@@ -15,6 +15,11 @@ namespace ProjetApiNet.Models
         // Propriété indispensable pour stocker la rémunération fixe selon le rôle (PDF)
         public decimal SalaireMensuelGNF { get; set; }
 
+        // Confirmation / activation du compte
+        public bool IsConfirmed { get; set; }
+        public string? ConfirmationToken { get; set; }
+        public DateTime? ConfirmationExpires { get; set; }
+
         // Relations Entity Framework Core
         public ICollection<GroupeTransport> GroupesSupervises { get; set; } = new List<GroupeTransport>();
         public ICollection<Camion> CamionsConduits { get; set; } = new List<Camion>();

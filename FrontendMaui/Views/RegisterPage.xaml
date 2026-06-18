@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FrontendMaui.ViewModels"
+             x:Class="FrontendMaui.Views.RegisterPage"
+             Title="Inscription"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="32,48" Spacing="16">
+
+            <!-- Titre -->
+            <Label Text="Créer un compte"
+                   FontSize="28" FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,8"/>
+
+            <!-- Identifiant -->
+            <Label Text="Identifiant" FontSize="13" TextColor="Gray"/>
+            <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444}"
+                    StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Entry Placeholder="Votre identifiant"
+                       Text="{Binding Identifiant}"
+                       Keyboard="Text"
+                       ReturnType="Next"
+                       Margin="12,0"/>
+            </Border>
+
+            <!-- Mot de passe -->
+            <Label Text="Mot de passe" FontSize="13" TextColor="Gray"/>
+            <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444}"
+                    StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Entry Placeholder="Minimum 6 caractères"
+                       Text="{Binding MotDePasse}"
+                       IsPassword="True"
+                       ReturnType="Next"
+                       Margin="12,0"/>
+            </Border>
+
+            <!-- Confirmation -->
+            <Label Text="Confirmer le mot de passe" FontSize="13" TextColor="Gray"/>
+            <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444}"
+                    StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Entry Placeholder="Répétez le mot de passe"
+                       Text="{Binding MotDePasseConfirm}"
+                       IsPassword="True"
+                       ReturnType="Done"
+                       Margin="12,0"/>
+            </Border>
+
+            <!-- Rôle -->
+            <Label Text="Rôle" FontSize="13" TextColor="Gray"/>
+            <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444}"
+                    StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Picker ItemsSource="{Binding Roles}"
+                        SelectedItem="{Binding RoleSelectionne}"
+                        Margin="12,4"/>
+            </Border>
+
+            <!-- Message d'erreur -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   FontSize="13"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center"/>
+
+            <!-- Bouton inscription -->
+            <Button Text="S'inscrire"
+                    Command="{Binding RegisterCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="#2E7D32"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="50"
+                    Margin="0,8,0,0"/>
+
+            <!-- Indicateur chargement -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="#2E7D32"
+                               HorizontalOptions="Center"/>
+
+            <!-- Retour login -->
+            <Label HorizontalOptions="Center" Margin="0,8,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Déjà un compte ? "/>
+                        <Span Text="Se connecter"
+                              TextColor="#1565C0"
+                              TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding GoToLoginCommand}"/>
+                            </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

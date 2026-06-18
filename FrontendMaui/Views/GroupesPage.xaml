@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:FrontendMaui.ViewModels"
+             xmlns:models="clr-namespace:FrontendMaui.Models"
+             x:DataType="viewmodel:GroupesViewModel"
+             x:Class="FrontendMaui.Views.GroupesPage"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto, *">
+        <Button Text="Actualiser" 
+                Command="{Binding GetGroupesCommand}"
+                Margin="10" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Groupes}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:GroupeTransport">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Nom}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="*, *">
+                                <VerticalStackLayout>
+                                    <Label Text="Superviseur" FontSize="12" TextColor="Gray" />
+                                    <Label Text="{Binding SuperviseurGroupeNom}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="Zone" FontSize="12" TextColor="Gray" />
+                                    <Label Text="{Binding ZoneMiniereNom}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Label Text="{Binding NombreDeCamions, StringFormat='Nombre de camions: {0}'}" 
+                                   FontSize="12" 
+                                   TextColor="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ActivityIndicator Grid.RowSpan="2"
+                           IsRunning="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

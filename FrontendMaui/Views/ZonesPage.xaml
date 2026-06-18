@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:FrontendMaui.ViewModels"
+             xmlns:models="clr-namespace:FrontendMaui.Models"
+             x:DataType="viewmodel:ZonesViewModel"
+             x:Class="FrontendMaui.Views.ZonesPage"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto, *">
+        <Button Text="Actualiser" 
+                Command="{Binding GetZonesCommand}"
+                Margin="10" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Zones}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ZoneMiniere">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Nom}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto">
+                                <VerticalStackLayout>
+                                    <Label Text="Distance A/R" FontSize="11" TextColor="Gray" />
+                                    <Label Text="{Binding DistanceAllerRetour, StringFormat='{0} km'}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="Tarif" FontSize="11" TextColor="Gray" />
+                                    <Label Text="{Binding Tarification, StringFormat='{0:N0} GNF'}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Row="1">
+                                    <Label Text="Tours Max/J" FontSize="11" TextColor="Gray" />
+                                    <Label Text="{Binding ToursMaxParJour}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                                    <Label Text="Chargements Max/M" FontSize="11" TextColor="Gray" />
+                                    <Label Text="{Binding ChargementsMaxParMois}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ActivityIndicator Grid.RowSpan="2"
+                           IsRunning="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

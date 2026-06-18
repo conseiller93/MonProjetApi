@@ -32,6 +32,8 @@ public class ChargementRepository : IChargementRepository
             .Include(c => c.Camion)
                 // CORRIGÉ : la propriété de navigation s'appelle GroupeTransport (pas Groupe)
                 .ThenInclude(cam => cam.GroupeTransport)
+            .Include(c => c.Camion)
+                .ThenInclude(cam => cam.Chauffeur)
             .Include(c => c.ZoneMiniere)  // CORRIGÉ : inclure directement ZoneMiniere depuis Chargement
             .ToListAsync();
     }
@@ -42,6 +44,8 @@ public class ChargementRepository : IChargementRepository
             .AsNoTracking()
             .Include(c => c.Camion)
                 .ThenInclude(cam => cam.GroupeTransport)
+            .Include(c => c.Camion)
+                .ThenInclude(cam => cam.Chauffeur)
             .Include(c => c.ZoneMiniere)
             .FirstOrDefaultAsync(c => c.Id == id);
     }

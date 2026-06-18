@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:FrontendMaui.ViewModels"
+             xmlns:models="clr-namespace:FrontendMaui.Models"
+             x:DataType="viewmodel:ChauffeursViewModel"
+             x:Class="FrontendMaui.Views.ChauffeursPage"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto, *">
+        <Button Text="Actualiser" 
+                Command="{Binding GetChauffeursCommand}"
+                Margin="10" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Chauffeurs}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Utilisateur">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Identifiant}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" />
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="Salaire Fixe:" FontAttributes="Italic" />
+                                <Label Text="{Binding SalaireMensuelGNF, StringFormat='{0:N0} GNF'}" Color="{StaticResource Primary}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ActivityIndicator Grid.RowSpan="2"
+                           IsRunning="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

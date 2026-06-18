@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:FrontendMaui.ViewModels"
+             x:DataType="viewmodel:StatisticsViewModel"
+             x:Class="FrontendMaui.Views.StatisticsPage"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Button Text="Actualiser" 
+                    Command="{Binding GetStatisticsCommand}"
+                    HorizontalOptions="End" />
+
+            <Frame Padding="20" CornerRadius="15" BorderColor="{StaticResource Primary}" BackgroundColor="{StaticResource Secondary}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="5">
+                    <Label Text="Total Chargements" FontSize="16" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalChargements}" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="20" CornerRadius="15" BorderColor="{StaticResource Primary}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="5">
+                    <Label Text="Total Carburant Consommé" FontSize="16" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalCarburant, StringFormat='{0:N0} Litres'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="20" CornerRadius="15" BorderColor="{StaticResource Primary}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="5">
+                    <Label Text="Total Primes Versées" FontSize="16" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalPrimes, StringFormat='{0:N0} GNF'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

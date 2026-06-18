@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FrontendMaui.Views.DashboardPage"
+             Title="Tableau de Bord Logistique"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView Padding="30">
+        <VerticalStackLayout Spacing="30">
+
+            <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                <Label Text="Tableau de Bord" FontSize="28" FontAttributes="Bold" TextColor="#212121"/>
+                <Label Text="- Vue d'ensemble" FontSize="18" VerticalOptions="End" Opacity="0.6"/>
+            </HorizontalStackLayout>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="20" RowDefinitions="Auto">
+
+                <Border Grid.Column="0" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="20">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Camions En Service" FontSize="14" TextColor="Gray" FontAttributes="Bold"/>
+                        <Label Text="14 / 20" FontSize="32" FontAttributes="Bold" TextColor="#1E88E5"/>
+                        <Label Text="Flotte opérationnelle" FontSize="12" TextColor="Green"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="20">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Chargements (Aujourd'hui)" FontSize="14" TextColor="Gray" FontAttributes="Bold"/>
+                        <Label Text="38" FontSize="32" FontAttributes="Bold" TextColor="#2E7D32"/>
+                        <Label Text="+12% par rapport à hier" FontSize="12" TextColor="Green"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="20">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Primes Générées" FontSize="14" TextColor="Gray" FontAttributes="Bold"/>
+                        <Label Text="4 500 000 GNF" FontSize="24" FontAttributes="Bold" TextColor="#E65100" Margin="0,8,0,0"/>
+                        <Label Text="Total chauffeurs &amp; superviseurs" FontSize="12" TextColor="Gray"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+
+            <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="25" HeightRequest="300">
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                    <Label Text="Graphique d'activité des flux miniers" FontAttributes="Bold" FontSize="16" TextColor="Gray"/>
+                    <Label Text="L'intégration des données de l'API /api/Chargements/stats arrivera ici." Opacity="0.5" FontSize="14"/>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
